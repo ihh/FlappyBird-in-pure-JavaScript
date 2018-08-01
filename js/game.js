@@ -8,6 +8,7 @@
     var game = this;
     var canvas = document.getElementById(elementID);
 
+    game.canvas = canvas;
     game.ctx = canvas.getContext('2d');
     game.screenWidth = canvas.scrollWidth;
     game.screenHeight = canvas.scrollHeight;
@@ -15,25 +16,25 @@
 
     game.drawWelcomePage();
 
-    game.keydownHandler = function (event) {
-      if (event.keyCode === 13) {
-        game.start();
-      }
-      window.removeEventListener("keydown", game.keydownHandler, false);
-    };
+    game.keydownHandler = game.clickHandler = game.start.bind (this);
 
     window.addEventListener("keydown", game.keydownHandler, false);
+    canvas.addEventListener("click", game.clickHandler, false);
   }
 
   Game.prototype.drawWelcomePage = function () {
     this.clearScreen();
 
     this.ctx.font = "25pt Arial";
-    this.ctx.fillText("Press enter to start...", 100, 100);
+    this.ctx.fillText("TOUCH HERE to start helping", 30, 100);
   };
 
   Game.prototype.start = function () {
     var game = this;
+
+    window.removeEventListener("keydown", game.keydownHandler, false);
+    game.canvas.removeEventListener("click", game.clickHandler, false);
+
     var bird = new Bird(game);
     var gaps = [250, 400, 550, 700, 850].map(function (xPos) {
       return new Gap(game, xPos);
@@ -94,9 +95,10 @@
     this.ctx.font = "40pt Arial";
     this.ctx.fillText("GAME OVER", 75, 100);
     this.ctx.font = "15pt Arial";
-    this.ctx.fillText("Press enter to play again!", 130, 150);
+    this.ctx.fillText("TOUCH HERE to help again", 110, 150);
     this.ctx.restore();
     window.addEventListener("keydown", this.keydownHandler, false);
+    this.canvas.addEventListener("click", this.clickHandler, false);
   };
 
   Game.prototype.clearScreen = function () {
@@ -110,19 +112,19 @@
   function Gap (game, xPos) {
     this.game = game;
     this.xPos = xPos;
-    this.yPos = Math.floor(Math.random() * (game.screenHeight - this.height)) + this.height / 2;
-    this.xSpeed = 1.5;
+    this.yPos = Math.floor(Math.random() * this.height) + this.height / 2;
+    this.xSpeed = 4;
   }
 
-  Gap.prototype.height = 70;
+  Gap.prototype.height = 150;
   Gap.prototype.width = 50;
 
   Gap.prototype.render = function () {
     this.game.ctx.globalCompositeOperation = "destination--over";
-    this.game.ctx.drawImage(this.pipeImage, (this.xPos - this.width / 2), (this.yPos + (this.height / 2)), 50, 154);
+    this.game.ctx.drawImage(this.pipeImage, (this.xPos - this.width / 2), (this.yPos + (this.height / 2)), this.width, this.height);
     this.game.ctx.save();
     this.game.ctx.scale(1, -1);
-    this.game.ctx.drawImage(this.pipeImage, (this.xPos - this.width / 2), -(this.yPos - (this.height / 2)), 50, 154);
+    this.game.ctx.drawImage(this.pipeImage, (this.xPos - this.width / 2), -(this.yPos - (this.height / 2)), this.width, this.height);
     this.game.ctx.restore();
   };
 
@@ -146,27 +148,28 @@
   Gap.prototype.pipeImage.addEventListener("load", function () {
     Gap.ready = true;
   });
-  Gap.prototype.pipeImage.src = "images/pipe.png";
+  Gap.prototype.pipeImage.src = "images/stalagmite.png";
 
   function Bird (game) {
     this.game = game;
     this.xPos = this.width / 2;
     this.yPos = game.screenHeight / 2;
-    this.xSpeed = 1.5;
+    this.xSpeed = 4;
     this.ySpeed = 0;
 
-    this.keydownHandler = function (event) {
-      if (event.keyCode === 13) {
-        this.ySpeed = 5;
-        this.sound.play();
-      }
-    }.bind(this);
+    this.flap = function() {
+      console.log ('flap')
+      this.ySpeed = 5;
+      this.sound.play();
+    };
+    this.keydownHandler = this.clickHandler = this.flap.bind(this);
 
     window.addEventListener("keydown", this.keydownHandler, false);
+    game.canvas.addEventListener("click", this.clickHandler, false);
   }
 
-  Bird.prototype.width = 30;
-  Bird.prototype.height = 21;
+  Bird.prototype.width = 60;
+  Bird.prototype.height = 40;
 
   Bird.prototype.render = function () {
     this.game.ctx.globalCompositeOperation = "destination-over";
@@ -201,6 +204,7 @@
 
   Bird.prototype.die = function () {
     window.removeEventListener("keydown", this.keydownHandler, false);
+    this.game.canvas.removeEventListener("click", this.clickHandler, false);
     this.game.gameover();
   };
 
@@ -212,7 +216,7 @@
   Bird.prototype.image.addEventListener("load", function () {
     Bird.ready = true;
   });
-  Bird.prototype.image.src = "images/bird.png";
+  Bird.prototype.image.src = "images/sub.png";
 
   new Game("playground");
 })(window, window.document);
