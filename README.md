@@ -1,8 +1,8 @@
-FlappyBird-in-pure-JavaScript
-=============================
+Submarine Cave Rescue
+=====================
 
-FlappyBird written in pure JavaScript!
+Submarine Cave Rescue!
 
-Works in Firefox, Chrome, Safari, maybe in IE9?(let me know if it does :))
+A total ripoff of [FlappyBird-in-pure-JavaScript](https://raw.githubusercontent.com/loveky/FlappyBird-in-pure-JavaScript/) by [loveky](https://github.com/loveky).
 
-![Screenshot](https://raw.githubusercontent.com/loveky/FlappyBird-in-pure-JavaScript/master/images/screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/ihh/FlappyBird-in-pure-JavaScript/master/images/screenshot.png)
